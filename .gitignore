@@ -1,0 +1,25 @@
+# Node dependencies
+node_modules/
+
+# Build artifacts
+dist/
+build/
+*.log
+*.tmp
+*.temp
+
+# Tauri / Rust outputs
+src-tauri/target/
+target/
+src-tauri/gen/
+
+# Environment files
+.env
+.env.*
+
+# Editor / OS files
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.swp

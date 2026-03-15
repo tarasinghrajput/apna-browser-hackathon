@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Apna Browser</title>
+    <link rel="stylesheet" href="./style.css" />
+  </head>
+  <body>
+    <div class="browser-shell">
+      <header class="toolbar" aria-label="Browser Toolbar">
+        <button id="back-btn" class="tool-btn" type="button" aria-label="Go back">Back</button>
+        <button id="forward-btn" class="tool-btn" type="button" aria-label="Go forward">Forward</button>
+        <button id="refresh-btn" class="tool-btn" type="button" aria-label="Refresh">Refresh</button>
+        <input
+          id="url-input"
+          class="url-input"
+          type="url"
+          placeholder="Enter URL or search term"
+          aria-label="URL input"
+        />
+        <button id="go-btn" class="tool-btn tool-btn-primary" type="button" aria-label="Go to URL">Go</button>
+        <button id="notes-toggle-btn" class="tool-btn" type="button" aria-label="Open notes">Notes</button>
+      </header>
+
+      <main class="content" aria-label="Browser content area">
+        <section class="main-pane">
+          <section id="home-view" class="home-view" aria-label="Custom homepage">
+            <h1>Apna Browser</h1>
+            <p class="home-subtitle">A lightweight browser workspace for students.</p>
+
+            <form id="home-search-form" class="home-search-form" aria-label="Homepage search">
+              <input
+                id="home-search-input"
+                class="home-search-input"
+                type="search"
+                placeholder="Search the web"
+                aria-label="Search the web"
+              />
+              <button class="tool-btn tool-btn-primary" type="submit">Search</button>
+            </form>
+
+            <section class="quick-links" aria-label="Quick links">
+              <h2>Quick Links</h2>
+              <div class="quick-link-grid">
+                <button class="quick-link" type="button" data-url="https://www.wikipedia.org/">Wikipedia</button>
+                <button class="quick-link" type="button" data-url="https://www.youtube.com/">YouTube</button>
+                <button class="quick-link" type="button" data-url="https://www.khanacademy.org/">Khan Academy</button>
+                <button class="quick-link" type="button" data-url="https://www.coursera.org/">Coursera</button>
+              </div>
+            </section>
+          </section>
+
+          <section
+            id="webview-host"
+            class="webview-host is-hidden"
+            aria-label="Native WebView host container"
+          >
+            <p id="webview-status" class="webview-status is-hidden"></p>
+          </section>
+        </section>
+
+        <aside id="notes-panel" class="notes-panel is-hidden" aria-label="Notes panel">
+          <h2>Study Notes</h2>
+          <textarea
+            id="notes-textarea"
+            placeholder="Write your notes here..."
+            aria-label="Notes text area"
+          ></textarea>
+        </aside>
+      </main>
+    </div>
+
+    <script type="module" src="./main.js"></script>
+  </body>
+</html>
