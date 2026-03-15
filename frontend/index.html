@@ -12,6 +12,11 @@
         <button id="back-btn" class="tool-btn" type="button" aria-label="Go back">Back</button>
         <button id="forward-btn" class="tool-btn" type="button" aria-label="Go forward">Forward</button>
         <button id="refresh-btn" class="tool-btn" type="button" aria-label="Refresh">Refresh</button>
+        <select id="search-engine-select" class="tool-select" aria-label="Select search engine">
+          <option value="google">Google</option>
+          <option value="duckduckgo">DuckDuckGo</option>
+          <option value="bing">Bing</option>
+        </select>
         <input
           id="url-input"
           class="url-input"
@@ -37,6 +42,11 @@
                 placeholder="Search the web"
                 aria-label="Search the web"
               />
+              <select id="home-search-engine-select" class="home-search-select" aria-label="Select search engine">
+                <option value="google">Google</option>
+                <option value="duckduckgo">DuckDuckGo</option>
+                <option value="bing">Bing</option>
+              </select>
               <button class="tool-btn tool-btn-primary" type="submit">Search</button>
             </form>
 
@@ -47,6 +57,24 @@
                 <button class="quick-link" type="button" data-url="https://www.youtube.com/">YouTube</button>
                 <button class="quick-link" type="button" data-url="https://www.khanacademy.org/">Khan Academy</button>
                 <button class="quick-link" type="button" data-url="https://www.coursera.org/">Coursera</button>
+              </div>
+            </section>
+
+            <section class="useful-websites" aria-label="Useful websites">
+              <h2>Useful Websites</h2>
+              <div class="quick-link-grid">
+                <button class="quick-link useful-link" type="button" data-url="https://developer.mozilla.org/">
+                  MDN Web Docs
+                </button>
+                <button class="quick-link useful-link" type="button" data-url="https://stackoverflow.com/">
+                  Stack Overflow
+                </button>
+                <button class="quick-link useful-link" type="button" data-url="https://github.com/">
+                  GitHub
+                </button>
+                <button class="quick-link useful-link" type="button" data-url="https://www.geeksforgeeks.org/">
+                  GeeksforGeeks
+                </button>
               </div>
             </section>
           </section>

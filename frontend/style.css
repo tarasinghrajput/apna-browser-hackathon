@@ -64,7 +64,9 @@ body {
 }
 
 .tool-btn:focus-visible,
-.url-input:focus-visible {
+.url-input:focus-visible,
+.tool-select:focus-visible,
+.home-search-select:focus-visible {
   outline: 2px solid var(--accent);
   outline-offset: 1px;
 }
@@ -92,6 +94,15 @@ body {
   padding: 10px 12px;
   color: var(--text);
   background: #ffffff;
+}
+
+.tool-select {
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 9px 10px;
+  background: #ffffff;
+  color: var(--text);
+  font-weight: 600;
 }
 
 .url-input::placeholder {
@@ -161,8 +172,22 @@ body {
   outline-offset: 1px;
 }
 
+.home-search-select {
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 10px 11px;
+  font-size: 0.95rem;
+  color: var(--text);
+  background: #ffffff;
+}
+
 .quick-links h2 {
   margin: 6px 0 10px;
+  font-size: 1.02rem;
+}
+
+.useful-websites h2 {
+  margin: 10px 0 10px;
   font-size: 1.02rem;
 }
 
@@ -187,6 +212,10 @@ body {
 .quick-link:hover {
   border-color: #acc2e4;
   background: #edf4ff;
+}
+
+.useful-link {
+  background: #f2f6ff;
 }
 
 .webview-host {
