@@ -1,42 +1,71 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
-use tauri::{Manager, Url};
+use tauri::{Manager, Url, WebviewUrl, WebviewWindow, WebviewWindowBuilder};
 
 const BROWSER_WEBVIEW_LABEL: &str = "browser-webview";
+const BROWSER_START_URL: &str = "about:blank";
 
-fn get_browser_webview(app: &tauri::AppHandle) -> Result<tauri::Webview, String> {
-  app
-    .get_webview(BROWSER_WEBVIEW_LABEL)
-    .ok_or_else(|| "Browser webview is not initialized yet.".to_string())
+fn create_browser_window(app: &tauri::AppHandle) -> Result<WebviewWindow, String> {
+  let initial_url = Url::parse(BROWSER_START_URL)
+    .map_err(|error| format!("Invalid browser start URL: {error}"))?;
+
+  WebviewWindowBuilder::new(app, BROWSER_WEBVIEW_LABEL, WebviewUrl::External(initial_url))
+    .title("Apna Browser - Web")
+    .inner_size(1200.0, 780.0)
+    .visible(false)
+    .build()
+    .map_err(|error| error.to_string())
 }
 
 #[tauri::command]
-fn navigate_browser_webview(app: tauri::AppHandle, url: String) -> Result<(), String> {
+async fn navigate_browser_webview(app: tauri::AppHandle, url: String) -> Result<(), String> {
   let parsed_url = Url::parse(&url).map_err(|error| format!("Invalid URL: {error}"))?;
-  let webview = get_browser_webview(&app)?;
-  webview.navigate(parsed_url).map_err(|error| error.to_string())
+
+  let browser_window = app
+    .get_webview_window(BROWSER_WEBVIEW_LABEL)
+    .map(Ok)
+    .unwrap_or_else(|| create_browser_window(&app))?;
+
+  browser_window
+    .navigate(parsed_url)
+    .map_err(|error| error.to_string())?;
+  browser_window.show().map_err(|error| error.to_string())?;
+  browser_window
+    .set_focus()
+    .map_err(|error| error.to_string())?;
+
+  Ok(())
 }
 
 #[tauri::command]
-fn browser_go_back(app: tauri::AppHandle) -> Result<(), String> {
-  let webview = get_browser_webview(&app)?;
-  webview
+async fn browser_go_back(app: tauri::AppHandle) -> Result<(), String> {
+  let browser_window = app
+    .get_webview_window(BROWSER_WEBVIEW_LABEL)
+    .ok_or_else(|| "Browser window is not initialized yet.".to_string())?;
+
+  browser_window
     .eval("window.history.back();")
     .map_err(|error| error.to_string())
 }
 
 #[tauri::command]
-fn browser_go_forward(app: tauri::AppHandle) -> Result<(), String> {
-  let webview = get_browser_webview(&app)?;
-  webview
+async fn browser_go_forward(app: tauri::AppHandle) -> Result<(), String> {
+  let browser_window = app
+    .get_webview_window(BROWSER_WEBVIEW_LABEL)
+    .ok_or_else(|| "Browser window is not initialized yet.".to_string())?;
+
+  browser_window
     .eval("window.history.forward();")
     .map_err(|error| error.to_string())
 }
 
 #[tauri::command]
-fn browser_reload(app: tauri::AppHandle) -> Result<(), String> {
-  let webview = get_browser_webview(&app)?;
-  webview.reload().map_err(|error| error.to_string())
+async fn browser_reload(app: tauri::AppHandle) -> Result<(), String> {
+  let browser_window = app
+    .get_webview_window(BROWSER_WEBVIEW_LABEL)
+    .ok_or_else(|| "Browser window is not initialized yet.".to_string())?;
+
+  browser_window.reload().map_err(|error| error.to_string())
 }
 
 fn main() {

@@ -19,13 +19,10 @@ const controls = {
 };
 
 const tauri = window.__TAURI__;
-const WebviewClass = tauri?.webview?.Webview;
-const currentWindow = tauri?.window?.getCurrentWindow?.();
 const invoke = tauri?.core?.invoke;
 
 const NOTES_KEY = "apna-browser-notes";
 const SEARCH_ENGINE_KEY = "apna-browser-search-engine";
-const WEBVIEW_LABEL = "browser-webview";
 const SEARCH_ENGINES = {
   google: "https://www.google.com/search?q=",
   duckduckgo: "https://duckduckgo.com/?q=",
@@ -34,14 +31,11 @@ const SEARCH_ENGINES = {
 const DEFAULT_SEARCH_ENGINE = "google";
 
 const state = {
-  nativeWebview: null,
   currentUrl: "",
   homeVisible: true,
   notesVisible: false,
   searchEngine: DEFAULT_SEARCH_ENGINE,
 };
-
-let relayoutTimer = null;
 
 function normalizeSearchEngine(engine) {
   return Object.prototype.hasOwnProperty.call(SEARCH_ENGINES, engine)
@@ -93,22 +87,6 @@ function setStatus(message) {
   controls.webviewStatus.classList.toggle("is-hidden", !message);
 }
 
-function getHostBounds() {
-  const hostRect = controls.webviewHost?.getBoundingClientRect();
-  if (!hostRect) return null;
-
-  const width = Math.round(hostRect.width);
-  const height = Math.round(hostRect.height);
-  if (width < 20 || height < 20) return null;
-
-  return {
-    x: Math.round(hostRect.left),
-    y: Math.round(hostRect.top),
-    width,
-    height,
-  };
-}
-
 async function invokeBackend(command, args = {}) {
   if (!invoke) {
     setStatus("Native invoke API is unavailable. Enable app.withGlobalTauri in tauri.conf.json.");
@@ -117,88 +95,11 @@ async function invokeBackend(command, args = {}) {
 
   try {
     await invoke(command, args);
-    setStatus("");
     return true;
   } catch (error) {
     console.error(`Failed command: ${command}`, error);
     setStatus(getErrorMessage(error));
     return false;
-  }
-}
-
-async function ensureNativeWebview(initialUrl) {
-  if (state.nativeWebview) return false;
-
-  if (!WebviewClass || !currentWindow) {
-    setStatus("Native Tauri WebView API is unavailable. Enable app.withGlobalTauri in tauri.conf.json.");
-    return null;
-  }
-
-  const bounds = getHostBounds();
-  if (!bounds) {
-    setStatus("WebView host area is not ready yet.");
-    return null;
-  }
-
-  try {
-    const webview = new WebviewClass(currentWindow, WEBVIEW_LABEL, {
-      url: initialUrl,
-      ...bounds,
-    });
-
-    state.nativeWebview = webview;
-    setStatus("");
-
-    webview.once("tauri://created", () => {
-      setStatus("");
-      void syncWebviewBounds();
-    });
-
-    webview.once("tauri://error", (event) => {
-      console.error("Native webview creation failed:", event);
-      const details = getErrorMessage(event?.payload ?? event?.error ?? event);
-      state.nativeWebview = null;
-      setStatus(`Unable to render this page in native WebView. ${details}`);
-    });
-
-    return true;
-  } catch (error) {
-    console.error("Failed to create native webview:", error);
-    setStatus("Failed to create native WebView. Check permissions in capabilities/default.json.");
-    return null;
-  }
-}
-
-async function syncWebviewBounds() {
-  if (!state.nativeWebview || state.homeVisible) return;
-
-  const bounds = getHostBounds();
-  if (!bounds) return;
-
-  try {
-    await state.nativeWebview.setPosition({ x: bounds.x, y: bounds.y });
-    await state.nativeWebview.setSize({ width: bounds.width, height: bounds.height });
-  } catch (error) {
-    console.error("Failed to resize native webview:", error);
-  }
-}
-
-async function hideNativeWebview() {
-  if (!state.nativeWebview) return;
-  try {
-    await state.nativeWebview.hide();
-  } catch (error) {
-    console.error("Failed to hide webview:", error);
-  }
-}
-
-async function showNativeWebview() {
-  if (!state.nativeWebview) return;
-  try {
-    await state.nativeWebview.show();
-    await syncWebviewBounds();
-  } catch (error) {
-    console.error("Failed to show webview:", error);
   }
 }
 
@@ -208,9 +109,9 @@ function setHomeVisible(visible) {
   controls.webviewHost?.classList.toggle("is-hidden", visible);
 
   if (visible) {
-    void hideNativeWebview();
-  } else {
-    void showNativeWebview();
+    setStatus("");
+  } else if (!controls.webviewStatus?.textContent) {
+    setStatus("Pages open in a separate native browser window.");
   }
 }
 
@@ -233,7 +134,6 @@ async function showHome() {
   controls.urlInput.value = "";
   setHomeVisible(true);
   updateToolbarState();
-  setStatus("");
 }
 
 async function loadUrl(url) {
@@ -242,33 +142,19 @@ async function loadUrl(url) {
     return;
   }
 
+  const loaded = await invokeBackend("navigate_browser_webview", { url });
+  if (!loaded) return;
+
   state.currentUrl = url;
   controls.urlInput.value = url;
   setHomeVisible(false);
   updateToolbarState();
-
-  const createdNow = await ensureNativeWebview(url);
-  if (createdNow === null) return;
-
-  await showNativeWebview();
-
-  if (!createdNow) {
-    await invokeBackend("navigate_browser_webview", { url });
-  }
+  setStatus("Page opened in a separate native browser window.");
 }
 
 async function navigateFromInput(rawValue) {
   const url = normalizeInputToUrl(rawValue);
   await loadUrl(url);
-}
-
-function scheduleRelayout() {
-  if (relayoutTimer) {
-    clearTimeout(relayoutTimer);
-  }
-  relayoutTimer = setTimeout(() => {
-    void syncWebviewBounds();
-  }, 80);
 }
 
 controls.goBtn?.addEventListener("click", () => {
@@ -319,15 +205,10 @@ controls.homeSearchEngineSelect?.addEventListener("change", () => {
 
 controls.notesToggleBtn?.addEventListener("click", () => {
   setNotesVisible(!state.notesVisible);
-  scheduleRelayout();
 });
 
 controls.notesTextarea?.addEventListener("input", () => {
   localStorage.setItem(NOTES_KEY, controls.notesTextarea.value);
-});
-
-window.addEventListener("resize", () => {
-  scheduleRelayout();
 });
 
 const savedNotes = localStorage.getItem(NOTES_KEY);

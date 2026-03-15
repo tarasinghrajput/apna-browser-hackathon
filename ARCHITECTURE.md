@@ -19,8 +19,13 @@ Browser UI
 - URL bar
 - Navigation buttons
 
-WebView Container
-- Renders websites
+Main Webview Window
+- Renders the Browser UI (toolbar, homepage, notes)
+
+Secondary Native Webview Window
+- Created from Rust using `WebviewWindowBuilder`
+- Loads and renders external websites
+- Controlled by toolbar actions (Go / Back / Forward / Refresh) via Tauri commands
 
 Feature Modules
 - Notes
