@@ -17,18 +17,20 @@ Guidelines:
 Development order:
 
 Step 1
-Create the browser window.
+Create the browser window using WebviewWindowBuilder.
 
 Step 2
-Implement the browser UI.
+Implement the browser UI in the main window.
 
 Step 3
-Embed the WebView.
+Create the native webview window (NOT embedded in HTML).
 
 Step 4
-Implement navigation.
+Implement navigation commands and event communication.
 
 Step 5
 Add a custom feature.
 
 Do not skip steps.
+
+Important: Tauri does NOT support embedding a webview inside HTML containers. The webview must be a separate native window created with WebviewWindowBuilder.

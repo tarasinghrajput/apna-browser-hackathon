@@ -12,13 +12,17 @@
       {
         "label": "main",
         "title": "Apna Browser",
-        "width": 1200,
-        "height": 780,
-        "resizable": true
+        "width": 1400,
+        "height": 900,
+        "resizable": true,
+        "minWidth": 800,
+        "minHeight": 600,
+        "center": true
       }
     ],
     "security": {
-      "csp": null
+      "csp": null,
+      "dangerousDisableAssetCspModification": true
     }
   },
   "bundle": {
