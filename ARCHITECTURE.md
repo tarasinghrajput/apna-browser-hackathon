@@ -20,14 +20,13 @@ Browser UI
 - Navigation buttons
 
 Main Webview Window
-- Renders the Browser UI (toolbar, homepage, notes)
+- Renders the Browser UI (toolbar, tab strip, homepage, AI workspace)
 
-Secondary Native Webview Window
+Secondary Native Browser Webview Window
 - Created from Rust using `WebviewWindowBuilder`
-- Loads and renders external websites
-- Controlled by toolbar actions (Go / Back / Forward / Refresh) via Tauri commands
+- Reused for browsing (single native window reused across tabs/actions)
+- Loads external URLs and handles Back / Forward / Refresh
+- Main UI tabs remain in the current window and control this browser window
 
 Feature Modules
-- Notes
-- Website blocker
-- AI summarizer
+- AI workspace (summaries, research mode, bookmarks, notes)
